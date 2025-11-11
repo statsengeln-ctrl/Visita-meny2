@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visita Interaktiv Meny</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background-color: #7FBA00;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 50px 20px;
+        }
+
+        .diagram-section {
+            position: relative;
+            width: 100%;
+            height: 800px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 80px;
+        }
+
+        /* Centrum cirkel - VD */
+        .center-circle {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            background: linear-gradient(135deg, #7FBA00 0%, #6BA500 100%);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1em;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(127, 186, 0, 0.3);
+            z-index: 10;
+            padding: 20px;
+            line-height: 1.3;
+        }
+
+        /* Inre ring - Chefsposter */
+        .inner-circle {
+            position: absolute;
+            width: 130px;
+            height: 130px;
+            background: #4A7729;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 0.85em;
+            text-align: center;
+            padding: 15px;
+            line-height: 1.2;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(74, 119, 41, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .inner-circle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(74, 119, 41, 0.5);
+        }
+
+        /* Yttre ring - Visitas tjänster */
+        .outer-circle {
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            background: #7FBA00;
+            border: 4px solid white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 0.9em;
+            text-align: center;
+            padding: 20px;
+            line-height: 1.3;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(127, 186, 0, 0.3);
+        }
+
+        .outer-circle:hover {
+            transform: scale(1.1);
+            background: #6BA500;
+            box-shadow: 0 8px 25px rgba(127, 186, 0, 0.5);
+        }
+
+        .outer-circle .icon {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+        }
+
+        /* Detaljvy */
+        .detail-section {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin: 40px auto;
+            max-width: 900px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border-top: 6px solid #7FBA00;
+        }
+
+        .detail-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #7FBA00;
+        }
+
+        .detail-header .icon {
+            font-size: 3em;
+        }
+
+        .detail-header h2 {
+            color: #4A7729;
+            font-size: 2em;
+        }
+
+        .detail-header .tagline {
+            color: #666;
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+
+        .service-list {
+            list-style: none;
+            margin: 30px 0;
+        }
+
+        .service-list li {
+            padding: 12px 0;
+            padding-left: 35px;
+            position: relative;
+            font-size: 1.05em;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .service-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #7FBA00;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+
+        .contact-button {
+            background: #4A7729;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .contact-button:hover {
+            background: #3a5f1f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 119, 41, 0.3);
+        }
+
+        .contact-info {
+            display: none;
+            background: #f5f5f5;
+            border-left: 4px solid #7FBA00;
+            padding: 20px;
+            margin-top: 15px;
+            border-radius: 5px;
+        }
+
+        .contact-info.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 300px; }
+        }
+
+        .contact-info p {
+            margin: 8px 0;
+            font-size: 1em;
+            color: #333;
+        }
+
+        .back-button {
+            background: transparent;
+            color: #7FBA00;
+            border: 2px solid #7FBA00;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: #7FBA00;
+            color: white;
+        }
+
+        .footer {
+            background: #4A7729;
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 80px;
+        }
+
+        .footer p {
+            margin: 10px 0;
+        }
+
+        /* Responsiv design */
+        @media (max-width: 768px) {
+            .diagram-section {
+                height: 600px;
+            }
+            
+            .center-circle {
+                width: 120px;
+                height: 120px;
+                font-size: 0.85em;
+            }
+            
+            .inner-circle {
+                width: 90px;
+                height: 90px;
+                font-size: 0.7em;
+            }
+            
+            .outer-circle {
+                width: 110px;
+                height: 110px;
+                font-size: 0.75em;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>VISITA INTERAKTIV MENY</h1>
+        <p>Din guide till allt vi kan hjälpa dig med</p>
+    </div>
+
+    <div class="container">
+        <div id="diagram-view">
+            <div class="diagram-section">
+                <!-- Centrum - VD -->
+                <div class="center-circle">
+                    VD /<br>Ledningsgrupp
+                </div>
+
+                <!-- Inre ring - Chefsposter -->
+                <div class="inner-circle" style="top: 50%; left: 50%; transform: translate(-50%, -280px);">
+                    COO<br>Operativ Chef
+                </div>
+                <div class="inner-circle" style="top: 50%; left: 50%; transform: translate(140px, -200px);">
+                    CFO<br>Ekonomichef
+                </div>
+                <div class="inner-circle" style="top: 50%; left: 50%; transform: translate(200px, 0px);">
+                    CRO<br>Revenue Manager
+                </div>
+                <div class="inner-circle" style="top: 50%; left: 50%; transform: translate(140px, 200px);">
+                    CMO<br>Marknadschef
+                </div>
+                <div class="inner-circle" style="top: 50%; left: 50%; transform: translate(-50%, 280px);">
+                    HR-direktör
+                </div>
+                <div class="inner-circle" style="top: 50%; left: 50%; transform: translate(-240px, 200px);">
+                    Restaurang-<br>chef
+                </div>
+                <div class="inner-circle" style="top: 50%; left: 50%; transform: translate(-300px, 0px);">
+                    CDO<br>Utvecklingschef
+                </div>
+                <div class="inner-circle" style="top: 50%; left: 50%; transform: translate(-240px, -200px);">
+                    Kommunikations-<br>chef
+                </div>
+
+                <!-- Yttre ring - Visitas tjänster -->
+                <div class="outer-circle" data-service="1" style="top: 50%; left: 50%; transform: translate(-50%, -380px);">
+                    <div class="icon">👥</div>
+                    Arbetsgivarfrågor & Arbetsrätt
+                </div>
+                <div class="outer-circle" data-service="2" style="top: 50%; left: 50%; transform: translate(220px, -310px);">
+                    <div class="icon">⚖️</div>
+                    Branschjuridik & Tillstånd
+                </div>
+                <div class="outer-circle" data-service="3" style="top: 50%; left: 50%; transform: translate(330px, -90px);">
+                    <div class="icon">📊</div>
+                    Branschekonomi
+                </div>
+                <div class="outer-circle" data-service="4" style="top: 50%; left: 50%; transform: translate(330px, 90px);">
+                    <div class="icon">🎓</div>
+                    Utbildning & Kompetens
+                </div>
+                <div class="outer-circle" data-service="5" style="top: 50%; left: 50%; transform: translate(220px, 310px);">
+                    <div class="icon">🏛️</div>
+                    Näringspolitik & Påverkan
+                </div>
+                <div class="outer-circle" data-service="6" style="top: 50%; left: 50%; transform: translate(-50%, 380px);">
+                    <div class="icon">🎁</div>
+                    Medlemsförmåner
+                </div>
+                <div class="outer-circle" data-service="7" style="top: 50%; left: 50%; transform: translate(-320px, 310px);">
+                    <div class="icon">🛎️</div>
+                    Medlemsservice
+                </div>
+                <div class="outer-circle" data-service="8" style="top: 50%; left: 50%; transform: translate(-430px, 90px);">
+                    <div class="icon">🗺️</div>
+                    Regionala frågor
+                </div>
+                <div class="outer-circle" data-service="9" style="top: 50%; left: 50%; transform: translate(-430px, -90px);">
+                    <div class="icon">📰</div>
+                    Kommunikation & Press
+                </div>
+            </div>
+        </div>
+
+        <!-- Detaljvyer -->
+        <div id="detail-1" class="detail-section">
+            <button class="back-button" onclick="showDiagram()">← Tillbaka till översikt</button>
+            <div class="detail-header">
+                <div class="icon">👥</div>
+                <div>
+                    <h2>Arbetsgivarfrågor & Arbetsrätt</h2>
+                    <div class="tagline">Experthjälp med personal och kollektivavtal</div>
+                </div>
+            </div>
+            <h3>Vad vi hjälper till med:</h3>
+            <ul class="service-list">
+                <li>Telefonrådgivning för arbetsgivarfrågor</li>
+                <li>Rådgivning kring kollektivavtal</li>
+                <li>Stöd vid förhandlingar med fackförbund</li>
+                <li>Hjälp med anställningsavtal och rekrytering</li>
+                <li>Rådgivning vid uppsägningar och avskedanden</li>
+                <li>Arbetsmiljöfrågor och arbetsmiljöarbete</li>
+                <li>Stöd med arbetstidsplanering och schemaläggning</li>
+                <li>Juridiskt ombud vid arbetsrättsliga tvister</li>
+                <li>Tillgång till Arbetsgivarguiden (mallar, checklistor)</li>
+            </ul>
+            <button class="contact-button" onclick="toggleContact(1)">📞 Kontakta oss</button>
+            <div id="contact-1" class="contact-info">
+                <p><strong>Telefonrådgivning:</strong> 08-762 74 10</p>
+                <p><strong>Öppettider:</strong> Mån-Tors 08:30-17:00, Fre 10:30-16:00</p>
+                <p><strong>Avdelning:</strong> Arbetsrätt & Förhandling</p>
+            </div>
+        </div>
+
+        <div id="detail-2" class="detail-section">
+            <button class="back-button" onclick="showDiagram()">← Tillbaka till översikt</button>
+            <div class="detail-header">
+                <div class="icon">⚖️</div>
+                <div>
+                    <h2>Branschjuridik & Tillstånd</h2>
+                    <div class="tagline">Juridisk expertis för ditt företag</div>
+                </div>
+            </div>
+            <h3>Vad vi hjälper till med:</h3>
+            <ul class="service-list">
+                <li>Rådgivning vid lokalhyresfrågor och hyresförhandlingar</li>
+                <li>Hjälp med serveringstillstånd och alkoholfrågor</li>
+                <li>EU-frågor och lagstiftning inom besöksnäringen</li>
+                <li>Stöd vid myndighetskontakter och ansökningar</li>
+                <li>Avtalshjälp och kontraktsgranskning</li>
+                <li>Företagsguiden för regler och tillstånd</li>
+                <li>Hjälp vid rättstvister och konfliktlösning</li>
+            </ul>
+            <button class="contact-button" onclick="toggleContact(2)">📞 Kontakta oss</button>
+            <div id="contact-2" class="contact-info">
+                <p><strong>Stefan Lundin, Chefsjurist Branschjuridik</strong></p>
+                <p><strong>Telefon:</strong> 08-762 74 05</p>
+                <p><strong>E-post:</strong> stefan.lundin@visita.se</p>
+            </div>
+        </div>
+
+        <div id="detail-3" class="detail-section">
+            <button class="back-button" onclick="showDiagram()">← Tillbaka till översikt</button>
+            <div class="detail-header">
+                <div class="icon">📊</div>
+                <div>
+                    <h2>Branschekonomi</h2>
+                    <div class="tagline">Data, analys och beslutsunderlag</div>
+                </div>
+            </div>
+            <h3>Vad vi hjälper till med:</h3>
+            <ul class="service-list">
+                <li>Marknadsbevakning och branschanalys</li>
+                <li>Lönestatistik och lönejämförelser</li>
+                <li>Data och nyckeltal för besöksnäringen</li>
+                <li>Ekonomiska beräkningar och kalkyler</li>
+                <li>Ekonomiska presentationer och rapporter</li>
+                <li>Konsumentundersökningar och marknadsinsikter</li>
+                <li>Benchmarking mot branschen</li>
+                <li>Skattefrågor ur påverkansperspektiv</li>
+            </ul>
+            <button class="contact-button" onclick="toggleContact(3)">📞 Kontakta oss</button>
+            <div id="contact-3" class="contact-info">
+                <p><strong>Avdelning:</strong> Branschekonomi</p>
+                <p><strong>Kontakt via växel:</strong> 08-762 74 00</p>
+            </div>
+        </div>
+
+        <div id="detail-4" class="detail-section">
+            <button class="back-button" onclick="showDiagram()">← Tillbaka till översikt</button>
+            <div class="detail-header">
+                <div class="icon">🎓</div>
+                <div>
+                    <h2>Utbildning & Kompetensförsörjning</h2>
+                    <div class="tagline">Utveckla din personal och verksamhet</div>
+                </div>
+            </div>
+            <h3>Vad vi hjälper till med:</h3>
+            <ul class="service-list">
+                <li>VisitaAkademin - kurser inom arbetsrätt, ledarskap, ekonomi</li>
+                <li>Ledarskapsutveckling och arbetsmiljöutbildning</li>
+                <li>Sälj- och serviceutbildningar</li>
+                <li>Certifiering och kvalitetssäkring av utbildningar</li>
+                <li>Stöd med lärlingsplatser och praktik</li>
+                <li>Hjälp vid rekrytering och kompetensmatchning</li>
+                <li>Kontakt med utbildningsinstanser</li>
+            </ul>
+            <button class="contact-button" onclick="toggleContact(4)">📞 Kontakta oss</button>
+            <div id="contact-4" class="contact-info">
+                <p><strong>Peter Thomelius, Chef kompetensförsörjning</strong></p>
+                <p><strong>Telefon:</strong> 08-762 74 67</p>
+                <p><strong>E-post:</strong> peter.thomelius@visita.se</p>
+                <p><strong>Webbplats:</strong> www.visitaakademin.se</p>
+            </div>
+        </div>
+
+        <div id="detail-5" class="detail-section">
+            <button class="back-button" onclick="showDiagram()">← Tillbaka till översikt</button>
+            <div class="detail-header">
+                <div class="icon">🏛️</div>
+                <div>
+                    <h2>Näringspolitik & Påverkan</h2>
+                    <div class="tagline">Påverka regler och politik för branschen</div>
+                </div>
+            </div>
+            <h3>Vad vi hjälper till med:</h3>
+            <ul class="service-list">
+                <li>Remissvar och politiskt påverkansarbete</li>
+                <li>Representation gentemot myndigheter och politiker</li>
+                <li>Regional utveckling och opinionsbildning</li>
+                <li>Stöd i hållbarhetsfrågor och turismfrämjande</li>
+                <li>Branschutvecklingsfrågor</li>
+                <li>EU-påverkan för besöksnäringen</li>
+                <li>Regelförenkling och lobbying</li>
+            </ul>
+            <button class="contact-button" onclick="toggleContact(5)">📞 Kontakta oss</button>
+            <div id="contact-5" class="contact-info">
+                <p><strong>Avdelning:</strong> Näringspolitik</p>
+                <p><strong>Kontakt via växel:</strong> 08-762 74 00</p>
+            </div>
+        </div>
+
+        <div id="detail-6" class="detail-section">
+            <button class="back-button" onclick="showDiagram()">← Tillbaka till översikt</button>
+            <div class="detail-header">
+                <div class="icon">🎁</div>
+                <div>
+                    <h2>Medlemsförmåner & Rabatter</h2>
+                    <div class="tagline">Dra nytta av förhandlade förmåner</div>
+                </div>
+            </div>
+            <h3>Vad vi erbjuder:</h3>
+            <ul class="service-list">
+                <li>Rabatter på försäkringar och pensioner</li>
+                <li>Specialvillkor för resegaranti och reseverksamheter</li>
+                <li>Rabatter för inredning och utrustning</li>
+                <li>Förmåner för IT-system och kassasystem</li>
+                <li>Juridisk rådgivning utöver basmedlemskap</li>
+                <li>Förmånliga bank- och finansavtal</li>
+                <li>Energi- och telekomjämförelser</li>
+            </ul>
+            <button class="contact-button" onclick="toggleContact(6)">📞 Kontakta oss</button>
+            <div id="contact-6" class="contact-info">
+                <p><strong>Sara Nordström, Marknadschef</strong></p>
+                <p><strong>Telefon:</strong> 08-762 74 29</p>
+                <p><strong>E-post:</strong> sara.nordstrom@visita.se</p>
+            </div>
+        </div>
+
+        <div id="detail-7" class="detail-section">
+            <button class="back-button" onclick="showDiagram()">← Tillbaka till översikt</button>
+            <div class="detail-header">
+                <div class="icon">🛎️</div>
+                <div>
+                    <h2>Medlemsservice & Support</h2>
+                    <div class="tagline">Hjälp med ditt medlemskap</div>
+                </div>
+            </div>
+            <h3>Vad vi hjälper till med:</h3>
+            <ul class="service-list">
+                <li>Hjälp med medlemsregistrering och administration</li>
+                <li>Inloggnings- & IT-support för digitala tjänster</li>
+                <li>Tillgång till digitala guider och mallar</li>
+                <li>Hjälp vid ändringar i företagsuppgifter</li>
+                <li>Stöd vid fakturafrågor</li>
+                <li>Utskick av medlemsintyg</li>
+            </ul>
+            <button class="contact-button" onclick="toggleContact(7)">📞 Kontakta oss</button>
+            <div id="contact-7" class="contact-info">
+                <p><strong>Medlemsservice:</strong> 08-762 74 50</p>
+                <p><strong>E-post:</strong> info@visita.se</p>
+            </div>
+        </div>
+
+        <div id="detail-8" class="detail-section">
+            <button class="back-button" onclick="showDiagram()">← Tillbaka till översikt</button>
+            <div class="detail-header">
+                <div class="icon">🗺️</div>
+                <div>
+                    <h2>Regionala frågor</h2>
+                    <div class="tagline">Lokalt stöd i din region</div>
+                </div>
+            </div>
+            <h3>Vad vi hjälper till med:</h3>
+            <ul class="service-list">
+                <li>Lokala nätverk och medlemsaktiviteter</li>
+                <li>Regionala utbildningar och branschmingel</li>
+                <li>Opinionsbildning och kontakt med lokala myndigheter</li>
+                <li>Lokala projekt och utvecklingsinsatser</li>
+            </ul>
+            <button class="contact-button" onclick="toggleContact(8)">📞 Kontakta oss</button>
+            <div id="contact-8" class="contact-info">
+                <p><strong>Visita Stockholm & Gotland:</strong> Hedvig Wilander</p>
+                <p><strong>Visita Södra (Malmö):</strong> 040-35 25 00</p>
+                <p><strong>Visita Västra (Göteborg):</strong> 031-62 94 00</p>
+                <p><strong>Visita Norrland (Umeå):</strong> 090-71 82 65</p>
+                <p><strong>Visita Mellersta:</strong> Via växel 08-762 74 00</p>
+            </div>
+        </div>
+
+        <div id="detail-9" class="detail-section">
+            <button class="back-button" onclick="showDiagram()">← Tillbaka till översikt</button>
+            <div class="detail-header">
+                <div class="icon">📰</div>
+                <div>
+                    <h2>Kommunikation & Press</h2>
+                    <div class="tagline">Stöd med mediekontakter</div>
+                </div>
+            </div>
+            <h3>Vad vi hjälper till med:</h3>
+            <ul class="service-list">
+                <li>Pressjour och stöd vid mediekontakter</li>
+                <li>Rådgivning kring kriskommunikation</li>
+                <li>Tillgång till statistik och branschinformation</li>
+                <li>Nyhetsbrev och branschuppdateringar</li>
+                <li>Rådgivning om extern PR och kommunikation</li>
+            </ul>
+            <button class="contact-button" onclick="toggleContact(9)">📞 Kontakta oss</button>
+            <div id="contact-9" class="contact-info">
+                <p><strong>Carl Johan Swanson, Kommunikationschef</strong></p>
+                <p><strong>Telefon:</strong> 08-762 74 46</p>
+                <p><strong>Mobil:</strong> 076-149 74 46</p>
+                <p><strong>E-post:</strong> carl.johan.swanson@visita.se</p>
+                <p><strong>Pressjour:</strong> 08-762 74 70</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>Visita - Svensk Besöksnäring</strong></p>
+        <p>Växel: 08-762 74 00 | E-post: info@visita.se</p>
+        <p>Webbplats: www.visita.se</p>
+        <p style="margin-top: 20px; opacity: 0.8;">© 2025 Visita. Interaktiv meny för medlemsföretag.</p>
+    </div>
+
+    <script>
+        // Klick på yttre cirklar
+        document.querySelectorAll('.outer-circle').forEach(circle => {
+            circle.addEventListener('click', function() {
+                const serviceId = this.getAttribute('data-service');
+                showDetail(serviceId);
+            });
+        });
+
+        function showDetail(id) {
+            // Dölj diagram
+            document.getElementById('diagram-view').style.display = 'none';
+            
+            // Dölj alla detaljvyer
+            document.querySelectorAll('.detail-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Visa vald detaljvy
+            document.getElementById('detail-' + id).classList.add('active');
+            
+            // Scrolla till toppen
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showDiagram() {
+            // Visa diagram
+            document.getElementById('diagram-view').style.display = 'block';
+            
+            // Dölj alla detaljvyer
+            document.querySelectorAll('.detail-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Scrolla till toppen
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleContact(id) {
+            const contactInfo = document.getElementById('contact-' + id);
+            contactInfo.classList.toggle('show');
+        }
+    </script>
+</body>
+</html>
